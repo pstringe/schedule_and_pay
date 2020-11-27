@@ -1,25 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import useScript from '../hooks/useScript'
 import ReactDOM from 'react-dom'
 
-import scriptLoader from 'react-async-script-loader'
-const PayPalButton = paypal.Buttons.driver('react', {React, ReactDOM});
-
+const Loading = () => {
+    return (
+        <div>
+            Loading Payment Portal
+        </div>
+    )
+}
 const Payment = (props) => {
     const [show, setShow] = useState(false);
-    window.React = React;
-    window.ReactDOM = ReactDOM;
-    
-    useEffect(() => {
-        const {
-            scriptLoaded,
-            scriptLoadSucceeded,
-        } = this.props;
-        if (scriptLoaded && scriptLoadSucceeded){
-            setShow(true);
-        }
-    });
+  
+    const CLIENT_ID = process.env.REACT_APP_PAYPAL_TEST_CLIENT_ID;
+    const status = useScript("https://www.paypal.com/sdk/js?client-id=" + CLIENT_ID);
+    console.log(status);
+    const PayPalButton = (status === 'ready') ? window.paypal.Buttons.driver("react", { React, ReactDOM }) : Loading ;
 
-    const creatOrder = (data, actions) => {
+    const createOrder = (data, actions) => {
         return actions.order.create({
             purchase_units: [
                 {
@@ -36,10 +34,10 @@ const Payment = (props) => {
     };
 
     return (
-        <PayPalButton
-            createOrder={(data, actions) => createOrder(data, actions)}
-            onApprove={(data, actions) => createOrder(data, actions)}
-        />
+        <div>
+            <PayPalButton  createOrder={(data, actions) => createOrder(data, actions)} 
+                            onApprove={(data, actions) => createOrder(data, actions)} />
+        </div>
     );
 };
 
